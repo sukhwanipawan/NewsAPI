@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Page</title>
+    <style>
+        * {
+            margin: 0;
+        }
+        body {
+            background-image: url(./newsBack.jpg);
+        }
+        #navBar {
+            list-style-type: none;
+            margin: 10px 10px 0px 10px;
+            padding: 0;
+            overflow: hidden;
+            background-color: khaki;
+            border-radius: 5px;
+            
+        }
+        li {
+            
+            float: left;
+        }
+        li a {
+            
+            display: block;
+            padding: 8px;
+        }
+        li a:hover {
+            background-color: rgb(122, 122, 202);
+            border-radius: 5px;
+            color: black;
+            font-weight: 900;
+        }
+        #Cate {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            width: 1380px;
+            margin: auto;
+            padding: 20px;
+            margin-left: 50px;
+            margin-top: 40px;
+            border: 2px solid greenyellow;
+            color: black;
+            background: yellowgreen;
+        }
+        .newsBox{
+            width: 430px;
+            height: 205px;
+            /* font-weight: 700; */
+            font-size: 15px;
+            border: 2px solid fuchsia;
+            padding: 10px;
+        }
+        .newsBox a {
+            color: blue;
+        }
+        h1 {
+            color: cyan;
+            margin-left: 100px;
+        }
+    </style>
+</head>
+<body>
+    <ul id="navBar">
+        <li> <a href="Business.html">Business</a></li>
+        <li> <a href="Sports.html">Sports</a></li>
+        <li> <a href="Entertainment.html">Entertainment</a></li>
+        <li> <a href="Technology.html">Technology</a></li>
+    </ul><br/><br/><br/>
+    <!-- <button id="search">Search</button> -->
+    <h1>Business</h1>
+    <div id="Cate" >
+
+    </div>
+
+    <script type="text/javascript">
+        // var btn = document.getElementById("search");
+        // btn.addEventListener("click", getNews);
+        window.addEventListener("load", getNews);
+
+        function searchForNews(){
+            return fetch(`https://newsapi.org/v2/top-headlines/sources?category=business&language=en&apiKey=a3f945e99e3d4ae988188c7d4711a0fa`)
+            .then (function (res){
+                return res.json();
+            })
+        }
+
+        async function getNews(){
+            try {
+                const result = await searchForNews();
+                console.log('result: ', result.sources);
+                displayCategory(result.sources);
+            }
+            catch(err){
+                console.log("Congrats finally you got an error");  
+            }
+        }
+
+        function displayCategory(sources){
+            const Cate = document.getElementById("Cate");
+            Cate.innerHTML = null;
+            for(let i = 0; i < 7; i++){
+                const div = document.createElement("div");
+                // console.log(i);
+                // console.log(sources[i]);
+                let news = newsCard(sources[i]);
+                Cate.append(news);
+            }
+        }
+
+
+        function newsCard(news){
+            const div = document.createElement("div");
+            const name = document.createElement("p");
+            name.textContent = news.name;
+
+            // name.setAttribute("style", "color: teal");
+
+            const link = document.createElement("a");
+            link.href = news.url;
+            link.textContent = "Detailed Page";
+            
+            const descr = document.createElement("p");
+            descr.textContent = news.description;
+            
+            descr.setAttribute("style", "color: white");
+
+            // const name = document.createElement("p");
+            // name.textContent = news.name;
+            name.setAttribute("style", "color: teal");
+
+            div.append("LINK: ");
+            div.appendChild(link);
+
+            div.innerHTML += '<br/>';
+            div.innerHTML += '<br/>';
+
+            div.append("NAME: ");
+            div.appendChild(name);
+
+            div.innerHTML += '<br/>';
+            div.innerHTML += '<br/>';
+
+            div.append("DESCRIPTION : ")
+            div.innerHTML += '<br/>';
+
+            div.appendChild(descr);
+            div.className = "newsBox";
+            return div;
+        }
+        // category: "business"
+        // country: "au"
+        // description: "The Australian Financial Review reports the latest news from business, finance, investment and politics, updated in real time. It has a reputation for independent, award-winning journalism and is essential reading for the business and investor community."
+        // id: "australian-financial-review"
+        // language: "en"
+        // name: "Australian Financial Review"
+        // url: "http://www.afr.com"
+    </script>
+</body>
+</html>
