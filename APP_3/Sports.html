@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Page</title>
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <ul id="navBar">
+        <li> <a href="Business.html">Business</a></li>
+        <li> <a href="Sports.html">Sports</a></li>
+        <li> <a href="Entertainment.html">Entertainment</a></li>
+        <li> <a href="Technology.html">Technology</a></li>
+        <li class="fLeft"> <button id="search">Search</button></li>
+        <li class="fLeft"> <input id="input" type="text" placeholder="Search News Here"/></li>
+    </ul><br/><br/><br/>
+    <!-- <button id="search">Search</button> -->
+    <h1 id="heading">Sports</h1>
+    <div id="pagination">
+        
+    </div>
+    <div id="Cate" >
+
+    </div>
+
+    <script type="text/javascript">
+        // var btn = document.getElementById("search");
+        // btn.addEventListener("click", getNews);
+        window.addEventListener("load", getNews);
+
+        let search = document.getElementById("search");
+        search.addEventListener("click", handleSearch);
+
+        let currentPage = 1;
+        let previousPage = currentPage - 1;
+        let nextPage = currentPage + 1;
+        let page_size = 6;
+
+        const pagination = document.getElementById("pagination");
+        pagination.addEventListener("click", handlePageChange);
+
+        async function handlePageChange(){
+            try {
+                const trgt = event.target.textContent;
+                if(trgt === "Next"){
+                    currentPage = currentPage + 1;
+                    console.log('currentPage: ', currentPage);
+                    console.log("Go on next page");
+
+                }
+                else if(trgt === "Prev"){
+                    currentPage = currentPage - 1;
+                    console.log('currentPage: ', currentPage);
+                    console.log("Go on previous page");
+                }
+                createPagination();
+                let input = document.getElementById("input").value;
+                let results = await fetchSearchQuery(input, currentPage);
+                displayCategory(results.articles);
+                
+            }
+            catch(err){
+                console.log("Error inside handlePageChange");
+            }
+            
+        }
+
+        // creating pagination for every webpage
+        function createPagination(){
+            const pagination = document.getElementById("pagination");
+            pagination.innerHTML = null;
+            const prevPage = document.createElement("button");
+            prevPage.textContent = "Prev";
+            prevPage.name = previousPage;
+            if(currentPage === 1){
+                prevPage.disabled = true;
+            }
+
+            const currPage = document.createElement("button");
+            currPage.textContent = currentPage;
+            currPage.name = currentPage;
+
+            const nextPage = document.createElement("button");
+            nextPage.textContent = "Next";
+            nextPage.name = nextPage;
+
+            pagination.append(prevPage, currPage, nextPage);
+
+
+        }
+        createPagination()
+
+        async function handleSearch(){
+            try {
+                let input = document.getElementById("input").value;
+                let searchResults = await fetchSearchQuery(input, currentPage);
+                let heading = document.getElementById("heading");
+                heading.innerHTML = null;
+                heading.textContent = "Search results for....    "+input;
+                // console.log(searchResults.articles);
+                displayCategory(searchResults.articles);
+                
+            }
+            catch(err){
+                // console.log("Hi you got an error inside handleSearch");
+            }
+        }
+
+        function fetchSearchQuery(query, currPage){
+            return fetch(`https://newsapi.org/v2/everything?q=${query}&page=${currPage}&pageSize=${page_size}&apiKey=a3f945e99e3d4ae988188c7d4711a0fa`)
+            .then (res => res.json());
+        }
+        
+        function searchForNews(){
+            return fetch(`https://newsapi.org/v2/top-headlines/sources?category=sports&language=en&apiKey=a3f945e99e3d4ae988188c7d4711a0fa`)
+            .then (function (res){
+                return res.json();
+            })
+        }
+
+        async function getNews(){
+            try {
+                const result = await searchForNews();
+                // console.log('result: ', result.sources);
+                displayCategory(result.sources);
+            }
+            catch(err){
+                // console.log("Congrats finally you got an error");  
+            }
+        }
+
+        function displayCategory(sources){
+            const cateGory = document.getElementById("Cate");
+            cateGory.innerHTML = null;
+            for(let i = 0; i < 7; i++){
+                const div = document.createElement("div");
+                // console.log(i);
+                // console.log(sources[i]);
+                let news = newsCard(sources[i]);
+                cateGory.append(news);
+            }
+            return true;
+        }
+
+        function newsCard(news){
+            const div = document.createElement("div");
+            const name = document.createElement("p");
+            name.textContent = news.name;
+            
+            if(!news.name){
+                name.textContent = news.title;
+            }
+            else if(news.name){
+                name.textContent = news.name;
+            }
+            
+            if(news.publishedAt){
+                const publishingTime = news.publishedAt.split("T")[0];
+                const time = document.createElement("p");
+                // console.log(publishingTime);
+                time.textContent = "Published on:- "+publishingTime;
+                div.append(time);
+                div.innerHTML += '<br/>';
+            }
+
+            const link = document.createElement("a");
+            link.href = news.url;
+            link.textContent = "Visit Detailed Page";
+            
+            const descr = document.createElement("p");
+            descr.textContent = news.description;
+            
+            descr.setAttribute("style", "color: white");
+
+            // const name = document.createElement("p");
+            // name.textContent = news.name;
+            name.setAttribute("style", "color: teal");
+
+
+            div.append("Title: ");
+            div.appendChild(name);
+
+            div.innerHTML += '<br/>';
+
+            if(news.urlToImage){
+                const imag = document.createElement("img");
+                imag.src = news.urlToImage;
+                div.appendChild(imag);
+                // div.innerHTML += '<br/>';
+            }
+            div.innerHTML += '<br/>';
+            div.append("Description : ")
+            div.innerHTML += '<br/>';
+
+            div.appendChild(descr);
+            div.className = "newsBox";
+            div.appendChild(link);
+
+            return div;
+        }
+       
+    </script>
+</body>
+</html>
